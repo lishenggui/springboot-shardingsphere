@@ -1,0 +1,59 @@
+spring:
+  shardingsphere:
+    datasource:
+      names: ds0,ds1
+      ds0:
+#        type: com.zaxxer.hikari.HikariDataSource
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://120.48.19.154:3306/ds1?useUnicode=true&characterEncoding=utf8&tinyInt1isBit=false&useSSL=false&serverTimezone=GMT
+        username: root
+        password: 123456
+      ds1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://120.48.19.154:3306/ds2?useUnicode=true&characterEncoding=utf8&tinyInt1isBit=false&useSSL=false&serverTimezone=GMT
+        username: root
+        password: 123456
+    sharding:
+      tables:
+        t_order:
+          actualDataNodes: ds${0..1}.t_order_${0..1}
+          databaseStrategy:
+            inline:
+              shardingColumn: order_id
+              algorithmExpression: ds${order_id % 2}
+          tableStrategy:
+            inline:
+              shardingColumn: user_id
+              algorithmExpression: t_order_${user_id % 2}
+          keyGenerator:
+            type: SNOWFLAKE
+            column: order_id
+        t_order_item:
+          actualDataNodes: ds${0..1}.t_order_item_${0..1}
+          databaseStrategy:
+            inline:
+              shardingColumn: order_id
+              algorithmExpression: ds${order_id % 2}
+          tableStrategy:
+            inline:
+              shardingColumn: product_id
+              algorithmExpression: t_order_item_${product_id % 2}
+      binding-tables: t_order,t_order_item
+      broadcast-tables: t_user
+      defaultDataSourceName: ds0
+      defaultTableStrategy:
+        none:
+      defaultKeyGenerator:
+        type: SNOWFLAKE
+        column: order_id
+    props:
+      sql.shwo: true
+
+#mybatis配置
+mybatis-plus:
+  mapperLocations: classpath*:mapper/*.xml
+  typeAliasesPackage: com.dzx.ccb.exam.exammanage.entity
+  configuration:
+    map-underscore-to-camel-case: true

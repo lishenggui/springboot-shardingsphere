@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demo.dao.OrderMapper">
+
+    <select id="getOrderDetails" resultType="com.demo.model.OrderDto">
+      select o.*,d.product_name  from t_order o left join t_order_item d
+      on o.order_id=d.order_id where o.order_id = #{orderId}
+    </select>
+
+</mapper>
